@@ -18,32 +18,27 @@ def sampling(args):
     epsilon = K.random_normal(shape=(batch, dim))
     return z_mean + K.exp(0.5 * z_log_var) * epsilon
 
-def AE_1(x_data):
+def build_encoder_decoder(x_data):
     inputs = layers.Input(shape = x_data.shape[1:])
     
+    # Encoder
     y = layers.Conv2D(8, 3, strides=2, padding="same")(inputs)
     y = layers.LeakyReLU()(y)
     y = layers.Conv2D(16, 3, strides=2, padding="same")(y)
     y = layers.LeakyReLU()(y)
-    
     y = layers.Conv2D(32, 3, strides=2, padding="same")(y)
     y = layers.LeakyReLU()(y)
-
+    
+    # Decoder
     y = layers.Conv2DTranspose(16, 3, strides=2, padding="same")(y)
     y = layers.LeakyReLU()(y)
     y = layers.Conv2DTranspose(8, 3, strides=2, padding="same")(y)
     y = layers.LeakyReLU()(y)
-
     y = layers.Conv2DTranspose(3, 3, strides=2, padding="same", name='outputs')(y)
+    
     outputs = layers.Activation('sigmoid')(y)
     
-    return models.Model(inputs,outputs, name = 'AE_1')
-
-import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import layers, models
-from tensorflow.keras import backend as K
-
+    return models.Model(inputs, outputs, name = 'EncoderDecoder')
 
 def build_vae():
     inputs = layers.Input(shape=(64,64,3))
