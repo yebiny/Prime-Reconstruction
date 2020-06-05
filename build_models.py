@@ -40,8 +40,8 @@ def build_encoder_decoder(x_data):
     
     return models.Model(inputs, outputs, name = 'EncoderDecoder')
 
-def build_vae():
-    inputs = layers.Input(shape=(64,64,3))
+def build_vae(x_data, z_dimension):
+    inputs = layers.Input(shape=x_data.shape[1:])
 
     y = layers.Conv2D(32, 3, strides=2, padding="same")(inputs)
     y = layers.LeakyReLU()(y)
@@ -56,11 +56,11 @@ def build_vae():
     y = layers.Dense(256, activation='relu')(y)
     y = layers.Dense(256, activation='relu')(y)
 
-    z_mean = layers.Dense(10, name="z_mean")(y)
-    z_log_var = layers.Dense(10, name="z_log_var")(y)
+    z_mean = layers.Dense(z_dimension, name="z_mean")(y)
+    z_log_var = layers.Dense(z_dimension, name="z_log_var")(y)
     z = layers.Lambda(sampling)([z_mean, z_log_var])
 
-    decoder_input = layers.Input(shape=(10,))
+    decoder_input = layers.Input(shape=(z_dimension,))
 
     y = layers.Dense(256, activation='relu')(decoder_input)
     y = layers.Dense(256, activation='relu')(y)

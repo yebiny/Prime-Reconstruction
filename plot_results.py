@@ -1,22 +1,42 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 
-def plot_recimg(model, x_data, save_dir=None, show='y'):
-    org_img = x_data[:100]
-    rec_img = model(x_data[:100], training=False)
-    fig, ax = plt.subplots(6, 10, figsize=(20, 10))
+def plot_gridimg(encoder, decoder, x_data, idx, zidx, xmin, xmax):
+    fig, ax = plt.subplots(1, 10, figsize=(20, 20),
+                             subplot_kw={'xticks': [], 'yticks': []})
+    org_img = x_data[idx]
+    z = encoder.predict(org_img.reshape(1,64,64,3))[2][0]
+    print('* original z space: ', z[zidx])
+    grid_x = np.linspace(xmin, xmax, 10)
     for i in range(10):
-        for j in range(6):
-            if j%2 ==0: img=org_img
-            else: img=rec_img
-            ax[j][i].set_axis_off()
-            ax[j][i].imshow(img[10*(j//2)+i])
+        z[zidx] = grid_x[i]
+        rec_img = decoder.predict(z.reshape(1, z.shape[0]))
+        ax[i].imshow(rec_img.reshape(64,64,3))
+        ax[i].set_title('z%i : %f'%(zidx, z[zidx]))
+    plt.show()
 
-    if save_dir != None:
-        plt.savefig('%s/recimg.png'%(save_dir))
-        print('Save Image in %s'%(save_dir))
-    if show == 'y':
+def plot_recimg(model, x_data, h, save_name=None, show='y'):
+    h , w = h, 10
+    fig, axes = plt.subplots(h, w, figsize=(w*2, h*2),
+                         subplot_kw={'xticks': [], 'yticks': []})
+    rec_img = model(x_data[:100])
+    org_img = x_data[:100]
+    for ax, i in zip(axes.flat, range(w*h)):
+        idx = i//2
+        if i%2 ==0: 
+            img = org_img[idx]
+            title = 'org %i'%(idx)
+        else:
+            img = rec_img[idx]
+            title = 'rec %i'%(idx)
+        ax.imshow(img)
+        ax.set_title(title)
+    if save_name !=None:
+        plt.savefig(save_name)
+    if show =='y':
         plt.show()
+    plt.close('all')
 
 def plot_loss(save_dir):
     log = pd.read_csv(save_dir+'/log.csv')
