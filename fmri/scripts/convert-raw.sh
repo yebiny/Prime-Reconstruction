@@ -1,40 +1,36 @@
 #!/bin/bash
-# author: mgsimon@princeton.edu
-# modified by kimghootae@gmail.com on Dec 21, 2018
-# dicoms are directly converted into nifti
-
 set -e  # fail immediately on error
+
+# variables
+SUBJ=${1}
+DICOM_DIR=${2}
+OUTPUT_DIR=${3}
+
+# custom these lines
 export BXH_DIR=packages/bxh_xcede_tools-1.11.14-MacOSX.i686/bin/
+source data/$SUBJ/dicom_list.sh
+run_order_file=data/$SUBJ/run-order.txt
 
-DICOM_DIR=${1}
-run_order_file=${2}
-output_dir=${3}
-DICOMLIST='0002 0003 0004 0005 0006 0007 0008 0009 0010 0011 0012 0013 0014'
-
-
-curr_dir=$PWD
-output_prefix=out
+# fix lines 
 ORIENTATION=LAS
 PREFIX=scan
 ERROR_FLAG=ERROR_RUN
 UNEXPECTED_NUMBER_OF_SCANS=1
 UNEXPECTED_NUMBER_OF_TRS=2
 
-
-
-if [ -d "$output_dir" ]; then
+# check output directory
+if [ -d "$OUTPUT_DIR" ]; then
   read -t 5 -p "data has already been converted. overwrite? (y/N) " overwrite || true
   if [ "$overwrite" != "y" ]; then exit; fi
-  rm -rf $output_dir
+  rm -rf $OUTPUT_DIR
 fi
-
-printf "* output dir : %s"$output_dir"\n"
-mkdir -p $output_dir
+printf "* output dir : %s"$OUTPUT_DIR"\n"
+mkdir -p $OUTPUT_DIR
 temp_output_dir=$(mktemp -d -t tmp.XXXXXX)
-#to aviod ARG_MAX problem
 
 
-printf "* data dir : %s"$DICOM_DIR
+# dicom2bxh
+printf "* data dir : %s"$DICOM_DIR"\n"
 t=0
 for i in $DICOMLIST
 do
@@ -71,7 +67,7 @@ cat $stripped_run_order_file | while read name num_expected_trs; do
     continue
   fi
 # convert the scan
-  niigz_file_prefix=$temp_output_dir/${output_prefix}_$name
+  niigz_file_prefix=$temp_output_dir/$name
   $BXH_DIR/bxh2analyze --analyzetypes --niigz --niftihdr -s "${temp_output_dir}/${PREFIX}-$number.bxh" $niigz_file_prefix 1>/dev/null 2>/dev/null
 
   if [ -n "$num_expected_trs" ]; then
@@ -88,5 +84,5 @@ printf "END2\n"
 rm -f $temp_output_dir/$PREFIX-*.bxh
 rm -f $temp_output_dir/$PREFIX-*.dat
 rm -f $stripped_run_order_file
-mv $temp_output_dir/* $output_dir
+mv $temp_output_dir/* $OUTPUT_DIR
 
