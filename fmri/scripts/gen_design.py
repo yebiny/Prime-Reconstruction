@@ -17,15 +17,15 @@ def make_phase1_onset_txt(onset_time, condition, output_dir, outfix='onset'):
             idx+=1
             f_name="%s/%s_train%i.txt"%(output_dir, outfix, idx)
             f = open(f_name, 'w')
-            data = '%i    %i    %i'%(t-6, 1, 1)
+            data = '%f    %i    %i'%(t-6, 1, 1)
             f.write(data)
             f.close()
         
         if c==4:
-            data = '%i    %i    %i\n'%(t-6, 1, 1)
+            data = '%f    %i    %i\n'%(t-6, 1, 1)
             fix_f.write(data)
         if c==1:
-            data = '%i    %i    %i\n'%(t-6, 1, 1)
+            data = '%f    %i    %i\n'%(t-6, 1, 1)
             stim_f.write(data)
                 
      

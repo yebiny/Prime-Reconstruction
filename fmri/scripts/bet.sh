@@ -11,5 +11,7 @@ if [ -d "$OUTPUT_DIR" ]; then
 fi
 mkdir -p $OUTPUT_DIR
 
-bet $TARGET_DIR/t1_mprage.nii.gz $OUTPUT_DIR/t1_mprage_brain.nii.gz
+bet $TARGET_DIR/t1_mprage.nii.gz $OUTPUT_DIR/t1_mprage_brain.nii.gz -R
 
+#! option: -m -B -f
+# mask , strict mode(-B, -R..) , -f 0.5 (defalt)
