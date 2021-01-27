@@ -32,10 +32,32 @@ def make_phase1_onset_txt(onset_time, condition, output_dir, outfix='onset'):
     fix_f.close()
     stim_f.close()
 
+def make_phase2_onset_txt(onset_time, condition, output_dir, outfix='onset'):
+
+    if os.path.isdir(output_dir)==False:
+        os.mkdir(output_dir)
+
+    init_f_name="%s/%s_init.txt"%(output_dir, outfix)
+    init_f = open(init_f_name, 'w')
+    rep_f_name="%s/%s_rep.txt"%(output_dir, outfix)
+    rep_f = open(rep_f_name, 'w')
+
+    for t, c in zip(onset_time, condition):
+        if c==1:
+            data = '%f    %i    %i\n'%(t-6, 1, 1)
+            init_f.write(data)
+            
+        if c==2:
+            data = '%f    %i    %i'%(t-6, 1, 1)
+            rep_f.write(data)
+
+    init_f.close()
+    rep_f.close()
 
 SUBJ=sys.argv[1]
-
-behavior_phase1_list=glob.glob('data/%s/behavior/*phase1*mat'%SUBJ)
+excute_path='/Users/nibey/Desktop/WorkSpace/kBRI/faceRec/fmri'
+behavior_phase1_list=glob.glob('%s/data/%s/behavior/*phase1*mat'%(excute_path, SUBJ))
+behavior_phase2_list=glob.glob('%s/data/%s/behavior/*phase2*mat'%(excute_path, SUBJ))
 
 for behavior_phase1 in behavior_phase1_list:
     
@@ -46,3 +68,12 @@ for behavior_phase1 in behavior_phase1_list:
     
     print('* ', behavior_phase1, output_dir)
     make_phase1_onset_txt(onset_time, condition, output_dir)
+
+for behavior_phase2 in behavior_phase2_list:
+    behavior_file=io.loadmat(behavior_phase2)
+    condition = behavior_file['designMat'][2]
+    onset_time= behavior_file['designMat'][6]
+    output_dir = behavior_phase2.replace('behavior/data_', 'design/').replace('.mat', '')
+    
+    print('* ', behavior_phase2, output_dir)
+    make_phase2_onset_txt(onset_time, condition, output_dir)
