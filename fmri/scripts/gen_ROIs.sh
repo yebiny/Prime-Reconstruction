@@ -1,5 +1,5 @@
 #!/bin/bash
-maskDir=visualCortexMasks
+maskDir=packages/visualCortexMasks
 maskName1=$maskDir/harvardoxford-cortical_prob_Lateral_Occipital_Cortex_inferior_division.nii.gz
 maskName2=$maskDir/harvardoxford-cortical_prob_Lingual_Gyrus.nii.gz
 maskName3=$maskDir/harvardoxford-cortical_prob_Occipital_Fusiform_Gyrus.nii.gz

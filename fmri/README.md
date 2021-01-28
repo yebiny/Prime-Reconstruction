@@ -1,8 +1,14 @@
+# Analysys full
+
 
 # Process
-## bash start-process.sh [subject] [ IMA directory path ]
+## 1. convert
+## 2. reorient
+## 3. 
+bash start-process.sh [subject] [ IMA directory path ]
 
 # Firstlevel-analysis
 ## Rendering
-### bash s
-## FEAT
+> bash start-rendering-firstlevel [ subject ] [ phase ] 
+## Feat
+> bash start-feat-firstlevel [ subject ] [ phase ]
