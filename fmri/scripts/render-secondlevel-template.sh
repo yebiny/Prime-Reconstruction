@@ -1,6 +1,7 @@
 #!/bin/bash
 source tool.sh
 
+
 function define_vars {
  firstlevel_dir=$1
  inifx=$2
@@ -31,5 +32,12 @@ template=${4}
 
 fsf_out=$output_dir/$infix.fsf
 gfeat_out=$output_dir/$infix.gfeat
+
+if [ -d "$output_dir" ]; then
+  read -t 5 -p "data has already been converted. overwrite? (y/N) " overwrite || true
+  if [ "$overwrite" != "y" ]; then exit; fi
+else mkdir $output_dir
+fi
+
 
 define_vars $input_dir $infix $gfeat_out | cat - "$template" | php > "$fsf_out"
