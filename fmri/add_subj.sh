@@ -11,3 +11,5 @@ if [ -d "$check" ]; then
 else 
 cp -rf $sample $check
 fi
+
+mkdir results/$SUBJ
