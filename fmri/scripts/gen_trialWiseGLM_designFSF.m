@@ -1,15 +1,15 @@
 %generating design for GLM
-function gen_trialWiseGLM_designFSF(pwd, subj)
+function gen_trialWiseGLM_designFSF(results, data, subj)
 
 
 %%
 nEV = [110 10];
 trainTest_list = {'train', 'test'};
 
-nifti=[pwd '/results/' subj '/2-reorient'];
-structure_image=[pwd '/results/' subj '/3-bet/t1_mprage_brain.nii.gz'];
-output_dir=[pwd '/results/' subj '/trial_wise'];
-design=[pwd '/data/' subj '/design'];
+nifti=[results '/' subj '/2-reorient'];
+structure_image=[results '/' subj '/3-bet/t1_mprage_brain.nii.gz'];
+output_dir=[results '/' subj '/trial_wise'];
+design=[data '/' subj '/design'];
 %%
 
 for run = 1:10
