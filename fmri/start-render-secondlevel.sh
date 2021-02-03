@@ -1,12 +1,12 @@
 #!/bin/bash
-
+source path.sh
 SUBJ=${1}
 INFIX=${2}
 
 TEMPLATE=templates/secondlevel_template.fsf
 
-input1=results/$SUBJ/firstlevel
+input1=$RESULTS/$SUBJ/firstlevel
 input2=$INFIX
-output=results/$SUBJ/secondlevel
+output=$RESULTS/$SUBJ/secondlevel
 
 bash scripts/render-secondlevel-template.sh $input1 $input2 $output $TEMPLATE

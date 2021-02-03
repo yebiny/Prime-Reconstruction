@@ -25,7 +25,7 @@ function define_vars {
  "
 }
 
-input_dir=$PWD/${1}
+input_dir=${1}
 infix=${2}
 output_dir=${3}
 template=${4}

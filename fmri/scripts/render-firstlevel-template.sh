@@ -22,19 +22,17 @@ function render_firstlevel {
   ev_dir2=$8
   ev_dir=$9
 
-  subject_dir=$(pwd)
-
   # note: the following replacements put absolute paths into the fsf file. this
   #       is necessary because FEAT changes directories internally
   cat $fsf_template \
-    | sed "s:<?= \$OUTPUT_DIR ?>:$subject_dir/$output_dir:g" \
+    | sed "s:<?= \$OUTPUT_DIR ?>:$output_dir:g" \
     | sed "s:<?= \$STANDARD_BRAIN ?>:$standard_brain:g" \
-    | sed "s:<?= \$DATA_FILE_PREFIX ?>:$subject_dir/$data_file_prefix:g" \
-    | sed "s:<?= \$INITIAL_HIGHRES_FILE ?>:$subject_dir/$initial_highres_file:g" \
-    | sed "s:<?= \$HIGHRES_FILE ?>:$subject_dir/$highres_file:g" \
-    | sed "s:<?= \$EV1 ?>:$subject_dir/$ev_dir1:g" \
-    | sed "s:<?= \$EV2 ?>:$subject_dir/$ev_dir2:g" \
-    | sed "s:<?= \$EV_DIR ?>:$subject_dir/$ev_dir:g" 
+    | sed "s:<?= \$DATA_FILE_PREFIX ?>:$data_file_prefix:g" \
+    | sed "s:<?= \$INITIAL_HIGHRES_FILE ?>:$initial_highres_file:g" \
+    | sed "s:<?= \$HIGHRES_FILE ?>:$highres_file:g" \
+    | sed "s:<?= \$EV1 ?>:$ev_dir1:g" \
+    | sed "s:<?= \$EV2 ?>:$ev_dir2:g" \
+    | sed "s:<?= \$EV_DIR ?>:$ev_dir:g" 
 
 }
 

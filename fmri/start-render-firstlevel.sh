@@ -1,13 +1,14 @@
 #!/bin/bash
+source path.sh
 
 SUBJ=${1}
 INFIX=${2}
 
-output=results/$SUBJ/firstlevel
-input1=results/$SUBJ/2-reorient
-input2=results/$SUBJ/3-bet/t1_mprage_brain.nii.gz
+output=$RESULTS/$SUBJ/firstlevel
+input1=$RESULTS/$SUBJ/2-reorient
+input2=$RESULTS/$SUBJ/3-bet/t1_mprage_brain.nii.gz
 
 template=templates/firstlevel_$INFIX.fsf
-design=data/$SUBJ/design
+design=$DATA/$SUBJ/design
 
 bash scripts/render-firstlevel-template.sh $input1 $input2 $output $template $design $INFIX

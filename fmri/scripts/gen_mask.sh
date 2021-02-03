@@ -1,9 +1,9 @@
 #!/bin/bash
+source path.sh
 
 SUBJ=${1}
-
-inputfile=results/$SUBJ/secondlevel/phase1.gfeat/cope3.feat/stats/zstat1.nii.gz
-outputDir=results/$SUBJ/mask
+inputfile=$RESULTS/$SUBJ/secondlevel/phase1.gfeat/cope3.feat/stats/zstat1.nii.gz
+outputDir=$RESULTS/$SUBJ/mask
 
 if [ -d "$outputDir" ]; then
   read -t 5 -p "data has already been converted. overwrite? (y/N) " overwrite || true
@@ -35,7 +35,7 @@ visCortexMask=$outputDir/stim_act_thr31_anatCut_bin.nii.gz
 cp $visCortexMask $outputDir/mask1.nii.gz
 gunzip $outputDir/mask1.nii.gz
 
-inputfile=results/$SUBJ/secondlevel/phase2.gfeat/cope3.feat/stats/zstat1.nii.gz
+inputfile=$RESULTS/$SUBJ/secondlevel/phase2.gfeat/cope3.feat/stats/zstat1.nii.gz
 outputfile=$outputDir/temp.nii.gz
 fslmaths $inputfile -mas $visCortexMask $outputfile
 inputfile=$outputDir/temp.nii.gz
@@ -47,7 +47,7 @@ fslmaths $inputfile -bin $outputfile
 
 
 
-inputfile=results/$SUBJ/secondlevel/phase2.gfeat/cope4.feat/stats/zstat1.nii.gz
+inputfile=$RESULTS/$SUBJ/secondlevel/phase2.gfeat/cope4.feat/stats/zstat1.nii.gz
 outputfile=$outputDir/temp.nii.gz
 fslmaths $inputfile -mas $visCortexMask $outputfile
 inputfile=$outputDir/temp.nii.gz
@@ -67,7 +67,7 @@ visCortexMask=$anatMask
 cp $visCortexMask $outputDir/mask2.nii.gz
 gunzip $outputDir/mask2.nii.gz
 
-inputfile=results/$SUBJ/secondlevel/phase2.gfeat/cope3.feat/stats/zstat1.nii.gz
+inputfile=$RESULTS/$SUBJ/secondlevel/phase2.gfeat/cope3.feat/stats/zstat1.nii.gz
 outputfile=$outputDir/temp.nii.gz
 fslmaths $inputfile -mas $visCortexMask $outputfile
 inputfile=$outputDir/temp.nii.gz
@@ -79,7 +79,7 @@ fslmaths $inputfile -bin $outputfile
 
 
 
-inputfile=results/$SUBJ/secondlevel/phase2.gfeat/cope4.feat/stats/zstat1.nii.gz
+inputfile=$RESULTS/$SUBJ/secondlevel/phase2.gfeat/cope4.feat/stats/zstat1.nii.gz
 outputfile=$outputDir/temp.nii.gz
 fslmaths $inputfile -mas $visCortexMask $outputfile
 inputfile=$outputDir/temp.nii.gz
