@@ -3,10 +3,11 @@
 
 ## ######################## aligning training data points(100) to standard (note taht there was a glm problem for using training + test)
 source tool.sh
+source path.sh
 
 SUBJ=${1}
-FIRSTLEVEL_DIR=results/$SUBJ/trial_wise
-MASK_DIR=results/$SUBJ/mask
+FIRSTLEVEL_DIR=$RESULTS/$SUBJ/trial_wise
+MASK_DIR=$RESULTS/$SUBJ/mask
 
 #################################### aligning tstat to standard
 for run in {1..10}; do
