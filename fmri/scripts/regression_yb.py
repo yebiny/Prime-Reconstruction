@@ -1,4 +1,5 @@
 import sklearn
+from sklearn import linear_model
 import numpy as np
 def get_corr(y_test, y_pred):
 
@@ -47,7 +48,7 @@ def regression_get_corr(act_arr, lat_arr):
         x_train, y_train = act_arr[mask_train], lat_arr[mask_train]
         x_test, y_test = act_arr[mask_test], lat_arr[mask_test]
 
-        line_fitter = sklearn.linear_model.LinearRegression()
+        line_fitter = linear_model.LinearRegression()
         line_fitter.fit(x_train, y_train)
         y_pred = line_fitter.predict(x_test)
 
