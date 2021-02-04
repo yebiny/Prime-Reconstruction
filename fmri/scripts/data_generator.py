@@ -1,19 +1,18 @@
 import numpy as np
 import scipy.io as sio
 import csv
-from nilearn import plotting
 import nibabel as nib
 import scipy
 import matplotlib.pyplot as plt
 
 class DataGenerator():
-    def __init__(self, SUBJ, nRun=10, nStim=110):
+    def __init__(self, SUBJ, RESULTS_PATH, DATA_PATH, nRun=10, nStim=110):
        
         # SET PATH HERE
-        path_run = 'results/%s/trial_wise/phase1_trialWiseGLM_train_run00.feat'%SUBJ
+        path_run = '%s/%s/trial_wise/phase1_trialWiseGLM_train_run00.feat'%(RESULTS_PATH, SUBJ)
         path_tstat = 'stats/tstat00_mask1.nii.gz'
-        path_behavior = 'data/%s/behavior/data_phase1_run00.mat'%SUBJ
-        path_mask = 'results/%s/mask/mask1.nii'%SUBJ
+        path_behavior = '%s/%s/behavior/data_phase1_run00.mat'%(DATA_PATH, SUBJ)
+        path_mask = '%s/%s/mask/mask1.nii'%(RESULTS_PATH, SUBJ)
         path_flat='scripts/f_latent.npy'
         path_mlat='scripts/m_latent.npy'
        
