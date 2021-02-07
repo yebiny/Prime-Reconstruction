@@ -1,4 +1,4 @@
-import matplotlib.pylot as plt
+import matplotlib.pyplot as plt
 import seaborn as sns
 
 def draw_imgs(imgs, save=None):
@@ -16,13 +16,12 @@ def draw_imgs(imgs, save=None):
                 img = imgs[:,idx,:]      
             elif j==2:
                 img = imgs[:,:,idx]
-
             plt.imshow(img, cmap='gray')
-    
+
     if save!=None:
         plt.savefig(save)
-    else: plt.show()
-    
+    plt.show()
+
 def cut_data(data):
     cut_data = data[10:80, 10:60, 10:60]
     return cut_data
