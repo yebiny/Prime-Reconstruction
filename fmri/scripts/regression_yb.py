@@ -1,6 +1,42 @@
 import sklearn
 from sklearn import linear_model
 import numpy as np
+import matplotlib.pyplot as plt
+import pickle
+
+def save_dict(dic, save_path):
+    with open(save_path,'wb') as fw:
+        pickle.dump(dic, fw)
+    
+def load_dict(load_path):
+    with open(load_path, 'rb') as fr:
+        dic = pickle.load(fr)
+    return dic
+
+
+def split_data(x, y, n_regression):
+    mask_train = []
+    mask_test = []
+    for i in range(10):
+        if i==n_regression:
+            w_train = [False for i in range(100)]
+            w_test = [True for i in range(100)]
+        else:
+            w_train = [True for i in range(100)]
+            w_test = [False for i in range(100)]
+        mask_train.extend(w_train)
+        mask_test.extend(w_test)
+
+    x_train, y_train = x[mask_train], y[mask_train]
+    x_test, y_test = x[mask_test], y[mask_test]
+
+    return x_train, y_train, x_test, y_test
+
+def make_model(x_train, y_train):
+    model = linear_model.LinearRegression()
+    model.fit(x_train, y_train)
+    return model
+
 def get_corr(y_test, y_pred):
 
     corr=[]
@@ -26,38 +62,119 @@ def get_corr(y_test, y_pred):
     return corr, self_corr, other_corr
 
 
-def regression_get_corr(act_arr, lat_arr):
+def start_analsysis_base(sub_list, load_path, corr_dict={}):
 
-    corrs=[]
-    selfs=[]
-    others=[]
+    for SUBJ in sub_list:
 
-    for n_regression in range(10):
-        mask_train = []
-        mask_test = []
-        for i in range(10):
-            if i==n_regression: 
-                w_train = [False for i in range(100)]
-                w_test = [True for i in range(100)]
-            else: 
-                w_train = [True for i in range(100)]
-                w_test = [False for i in range(100)]
-            mask_train.extend(w_train)
-            mask_test.extend(w_test)
-
-        x_train, y_train = act_arr[mask_train], lat_arr[mask_train]
-        x_test, y_test = act_arr[mask_test], lat_arr[mask_test]
-
-        line_fitter = linear_model.LinearRegression()
-        line_fitter.fit(x_train, y_train)
-        y_pred = line_fitter.predict(x_test)
-
-
-        corr, self_corr, other_corr = get_corr(y_test, y_pred)
-
-        print(self_corr, other_corr)
-        corrs.append(corr)
-        selfs.append(self_corr)
-        others.append(other_corr)
+        print('[%s] self_all other_all self_sup other_sup self_enh other_enh'%SUBJ)
+        if SUBJ in corr_dict: continue 
+        else: corr_dict[SUBJ]=[[] for i in range(6)]
         
-    return corrs, selfs, others
+        # make dataset
+        x = np.load('%s/x_mask.npy'%load_path%SUBJ)
+        y = np.load('%s/y_arr.npy'%load_path%SUBJ)
+        x_sup = np.load('%s/x_sup.npy'%load_path%SUBJ)
+        x_enh = np.load('%s/x_enh.npy'%load_path%SUBJ)
+        print(x.shape, x_sup.shape, x_enh.shape)
+
+        # start regression
+        for n_iter in range(10):
+            # step 1 make regression model with (x, y)
+            x_train, y_train, x_test, y_test = split_data(x, y, n_iter)
+            model = make_model(x_train, y_train)
+
+            # step 2-1 use model - all
+            y_pred = model.predict(x_test)
+
+            # step 2-2 use model - sup only
+            _, _, x_sup_test, y_test = split_data(x_sup, y, n_iter)
+            y_sup_pred = model.predict(x_sup_test)
+
+            # step 2-3 use model - enh only
+            _, _, x_enh_test, y_test = split_data(x_enh, y, n_iter)
+            y_enh_pred = model.predict(x_enh_test)
+
+            # step 3-1 get self, other corr - all
+            corr, self_all, other_all = get_corr(y_test, y_pred)
+
+            # step 3-2 get self, other corr - sup
+            corr, self_sup, other_sup = get_corr(y_test, y_sup_pred)
+
+            # step 3-3 get self, other corr - enh
+            corr, self_enh, other_enh = get_corr(y_test, y_enh_pred)
+
+            print('* %i :     %.3f    %.3f     %.3f    %.3f     %.3f    %.3f'
+                  %(n_iter, self_all, other_all, self_sup, other_sup, self_enh, other_enh))
+            for vi, v in enumerate([self_all, other_all, self_sup, other_sup, self_enh, other_enh]):
+                corr_dict[SUBJ][vi].append(v)
+
+    return corr_dict
+
+def start_analsysis_diffR(sub_list, load_path, corr_dict={}):
+
+    for SUBJ in sub_list:
+
+        print('[%s] self_all other_all self_sup other_sup self_enh other_enh'%SUBJ)
+        if SUBJ in corr_dict: continue 
+
+        corr_dict[SUBJ]=[[] for i in range(6)]
+        
+        x = np.load('%s/x_mask.npy'%load_path%SUBJ)
+        y = np.load('%s/y_arr.npy'%load_path%SUBJ)
+        sup_mask = np.load('%s/sup_mask.npy'%load_path%SUBJ)
+        enh_mask = np.load('%s/enh_mask.npy'%load_path%SUBJ)
+        
+        x_sup = x[:, sup_mask!=0]
+        x_enh = x[:, enh_mask!=0]
+        print(x.shape, x_sup.shape, x_enh.shape)
+
+
+        for n_iter in range(10):
+            # step 1 make regression model with (x, y)
+            x_train, y_train, x_test, y_test = split_data(x, y, n_iter)
+            model = make_model(x_train, y_train)
+            y_pred = model.predict(x_test)
+            corr, self_all, other_all = get_corr(y_test, y_pred)
+
+            # step 2 make regression model with (x_sup, y)
+            x_train, y_train, x_test, y_test = split_data(x_sup, y, n_iter)
+            model = make_model(x_train, y_train)
+            y_pred = model.predict(x_test)
+            corr, self_sup, other_sup = get_corr(y_test, y_pred)
+
+            # step 3 make regression model with (x_enh, y)
+            x_train, y_train, x_test, y_test = split_data(x_enh, y, n_iter)
+            model = make_model(x_train, y_train)
+            y_pred = model.predict(x_test)
+            corr, self_enh, other_enh = get_corr(y_test, y_pred)
+
+
+            print('* %i :     %.3f    %.3f     %.3f    %.3f     %.3f    %.3f'
+                  %(n_iter, self_all, other_all, self_sup, other_sup, self_enh, other_enh))
+            for vi, v in enumerate([self_all, other_all, self_sup, other_sup, self_enh, other_enh]):
+                corr_dict[SUBJ][vi].append(v)
+                
+    return corr_dict
+
+
+def hist_with_dict(dic, save=None):
+
+    plt.figure(figsize=(12,5))
+    mean_val=[0 for i in range(6)]
+    c_list=['g','g','b','b','r','r']
+    values=['self all', 'other all', 'self sup', 'other sup', 'self enh', 'other enh']
+    for keyi, key in enumerate(dic.keys()):
+        for vi, (val_name, val) in enumerate(zip(values, dic[key])):
+            if vi%2==0:
+                plt.plot([values[vi], values[vi+1]], [np.mean(val), np.mean(dic[key][vi+1]) ] 
+                     , marker='.', c='grey', linewidth=0.2)
+            mean_val[vi]+=(np.mean(val)/len(dic)) 
+    
+    for mi, mean in enumerate(mean_val):
+        plt.bar(mi, mean, alpha=0.4, color=c_list[mi], width=0.7)
+        if mi%2==0:
+            plt.plot([mi, mi+1], [mean_val[mi], mean_val[mi+1]] 
+             , marker='.', c=c_list[mi], linewidth=1)
+    if save!=None:
+        plt.savefig(save)
+    plt.show()
