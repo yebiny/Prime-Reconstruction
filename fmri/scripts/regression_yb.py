@@ -1,4 +1,5 @@
 import sklearn
+import copy
 from sklearn import linear_model
 import numpy as np
 import matplotlib.pyplot as plt
@@ -62,7 +63,7 @@ def get_corr(y_test, y_pred):
     return corr, self_corr, other_corr
 
 
-def start_analsysis_base(sub_list, load_path, corr_dict={}):
+def start_analsysis_base(sub_list, load_path, corr_dict):
 
     for SUBJ in sub_list:
 
@@ -110,7 +111,84 @@ def start_analsysis_base(sub_list, load_path, corr_dict={}):
 
     return corr_dict
 
-def start_analsysis_diffR(sub_list, load_path, corr_dict={}):
+def start_analsysis_base_rndSample(sub_list, load_path, corr_dict):
+    
+    def _get_rnd_sample(x, more_mask, less_mask):
+
+        mask_idx = np.where(more_mask==1)[0]
+        mask_idx = np.random.choice(mask_idx, np.count_nonzero(less_mask), replace=False)
+        rnd_mask=[]
+        for idx in range(x.shape[1]):
+            if idx in mask_idx: rnd_mask.append(1)
+            else: rnd_mask.append(0)
+        rnd_mask = np.array(rnd_mask)
+
+        x_more = copy.deepcopy(x)
+        x_less = copy.deepcopy(x)
+
+        x_more[:, rnd_mask==0]=0
+        x_less[:, less_mask==0]=0
+        return x_more, x_less
+
+    
+    for SUBJ in sub_list:
+
+            if SUBJ in corr_dict: 
+                    print('pass %s'%SUBJ)
+                    continue
+            else: corr_dict[SUBJ]=[[] for i in range(6)]
+
+            # make dataset
+            x = np.load('%s/x_mask.npy'%load_path%SUBJ)
+            y = np.load('%s/y_arr.npy'%load_path%SUBJ)
+
+            sup_mask = np.load('%s/sup_mask.npy'%load_path%SUBJ)
+            enh_mask = np.load('%s/enh_mask.npy'%load_path%SUBJ)
+            n_sup, n_enh = np.count_nonzero(sup_mask), np.count_nonzero(enh_mask)
+            if n_sup>n_enh:
+                x_sup, x_enh  = _get_rnd_sample(x, sup_mask, enh_mask)
+            else: 
+                x_enh, x_sup  = _get_rnd_sample(x, enh_mask, sup_mask)
+
+                
+            print('[ %s ]'%SUBJ, x.shape, n_sup, n_enh, x_sup.shape, x_enh.shape, 
+                  np.count_nonzero(x_sup[0]), np.count_nonzero(x_enh[0]))
+
+            print('Variables  self_all other_all self_sup other_sup self_enh other_enh')
+            # start regression
+            for n_iter in range(10):
+                # step 1 make regression model with (x, y)
+                x_train, y_train, x_test, y_test = split_data(x, y, n_iter)
+                model = make_model(x_train, y_train)
+
+                # step 2-1 use model - all
+                y_pred = model.predict(x_test)
+
+                # step 2-2 use model - sup only
+                _, _, x_sup_test, y_test = split_data(x_sup, y, n_iter)
+                y_sup_pred = model.predict(x_sup_test)
+
+                # step 2-3 use model - enh only
+                _, _, x_enh_test, y_test = split_data(x_enh, y, n_iter)
+                y_enh_pred = model.predict(x_enh_test)
+
+                # step 3-1 get self, other corr - all
+                corr, self_all, other_all = get_corr(y_test, y_pred)
+
+                # step 3-2 get self, other corr - sup
+                corr, self_sup, other_sup = get_corr(y_test, y_sup_pred)
+
+                # step 3-3 get self, other corr - enh
+                corr, self_enh, other_enh = get_corr(y_test, y_enh_pred)
+
+                print('* %i    :     %.3f    %.3f     %.3f    %.3f     %.3f    %.3f'
+                      %(n_iter, self_all, other_all, self_sup, other_sup, self_enh, other_enh))
+                for vi, v in enumerate([self_all, other_all, self_sup, other_sup, self_enh, other_enh]):
+                    corr_dict[SUBJ][vi].append(v)
+
+    return corr_dict
+
+def start_analsysis_diffR(sub_list, load_path, corr_dict):
 
     for SUBJ in sub_list:
 
@@ -156,6 +234,67 @@ def start_analsysis_diffR(sub_list, load_path, corr_dict={}):
                 
     return corr_dict
 
+def start_analsysis_diffR_rndSample(sub_list, load_path, corr_dict):
+
+    def _get_rnd_sample(x_sup, x_enh):
+        if x_sup.shape[1]<x_enh.shape[1]: return x_sup
+        else:         
+            mask_idx=np.random.choice([i for i in range(x_sup.shape[1])], x_enh.shape[1], replace=False)
+            mask_idx.sort()
+            mask=[]
+            for idx in range(x_sup.shape[1]):
+                if idx in mask_idx: mask.append(True)
+                else: mask.append(False)
+
+            x_rnd=x_sup[:,mask]
+
+            return x_rnd
+
+    for SUBJ in sub_list:
+
+            print('[%s] self_all other_all self_sup other_sup self_enh other_enh'%SUBJ)
+            if SUBJ in corr_dict: continue
+
+            corr_dict[SUBJ]=[[] for i in range(6)]
+
+            x = np.load('%s/x_mask.npy'%load_path%SUBJ)
+            y = np.load('%s/y_arr.npy'%load_path%SUBJ)
+            sup_mask = np.load('%s/sup_mask.npy'%load_path%SUBJ)
+            enh_mask = np.load('%s/enh_mask.npy'%load_path%SUBJ)
+
+            x_sup = x[:, sup_mask!=0]
+            x_enh = x[:, enh_mask!=0]
+
+            x_sup_rnd = _get_rnd_sample(x_sup, x_enh)
+            print(x.shape, x_sup_rnd.shape, x_enh.shape)
+            
+            for n_iter in range(10):
+                # step 1 make regression model with (x, y)
+                x_train, y_train, x_test, y_test = split_data(x, y, n_iter)
+                model = make_model(x_train, y_train)
+                y_pred = model.predict(x_test)
+                corr, self_all, other_all = get_corr(y_test, y_pred)
+
+                # step 2 make regression model with (x_sup_rnd, y)
+                x_train, y_train, x_test, y_test = split_data(x_sup_rnd, y, n_iter)
+                model = make_model(x_train, y_train)
+                y_pred = model.predict(x_test)
+                corr, self_sup_rnd, other_sup_rnd = get_corr(y_test, y_pred)
+
+                # step 3 make regression model with (x_enh, y)
+                x_train, y_train, x_test, y_test = split_data(x_enh, y, n_iter)
+                model = make_model(x_train, y_train)
+                y_pred = model.predict(x_test)
+                corr, self_enh, other_enh = get_corr(y_test, y_pred)
+
+
+                print('* %i :     %.3f    %.3f     %.3f    %.3f     %.3f    %.3f'
+                      %(n_iter, self_all, other_all, self_sup_rnd, other_sup_rnd, self_enh, other_enh))
+                for vi, v in enumerate([self_all, other_all, self_sup_rnd, other_sup_rnd, self_enh, other_enh]):
+                    corr_dict[SUBJ][vi].append(v)
+
+    return corr_dict
+        
 
 def hist_with_dict(dic, save=None):
 
