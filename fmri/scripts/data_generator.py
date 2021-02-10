@@ -25,7 +25,8 @@ class DataGenerator():
         self.run_list=[path_run.replace('00', str(i)) for i in range(1, 1+nRun)]
         self.tstat_list=[path_tstat.replace('00', str(i)) for i in range(1, 1+nStim)]
         self.behavior_list=[path_behavior.replace('00', str(i)) for i in range(1, 1+nRun)]
-                
+        self.mask_dir = '%s/%s/mask/'%(RESULTS_PATH, SUBJ)
+
     def get_info_list(self):
 
         info_list=[]
@@ -82,4 +83,16 @@ class DataGenerator():
             voxel_masked[i]=v_masked
         
         return voxel_masked
+
+        
+    def get_sup_enh_mask(self, enh_mask, sup_mask):
     
+        enh = nib.load(enh_mask)
+        enh = enh.get_fdata()
+        sup = nib.load(sup_mask)
+        sup = sup.get_fdata()
+    
+        mask_enh = enh[self.mask==1]
+        mask_sup = sup[self.mask==1]
+        
+        return mask_enh, mask_sup
