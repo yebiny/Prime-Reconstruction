@@ -1,3 +1,4 @@
+import os,sys, argparse
 import numpy as np
 import scipy.io as sio
 import csv
@@ -41,8 +42,6 @@ class DataGenerator():
                 if condition[idx]!=1: continue
                 info =  [ [run+1, idx+1], '%s/%s'%(r, t), [int(img_gender[idx]), int(img_idx[idx])] ]
                 info_list.append(info) 
-        print("* number of infos: %i"%len(info_list) )
-        print("* smaple info:")
         print(info_list[0])
         return info_list
     
@@ -85,14 +84,52 @@ class DataGenerator():
         return voxel_masked
 
         
-    def get_sup_enh_mask(self, enh_mask, sup_mask):
+    def get_sup_enh_mask(self, sup_mask, enh_mask):
     
-        enh = nib.load(enh_mask)
-        enh = enh.get_fdata()
         sup = nib.load(sup_mask)
         sup = sup.get_fdata()
+        enh = nib.load(enh_mask)
+        enh = enh.get_fdata()
     
-        mask_enh = enh[self.mask==1]
         mask_sup = sup[self.mask==1]
+        mask_enh = enh[self.mask==1]
         
-        return mask_enh, mask_sup
+        return mask_sup, mask_enh
+
+
+def parse_args():
+    opt = argparse.ArgumentParser(description="==== Data generator for regression  ====")
+    opt.add_argument(dest='DATA', type=str, help=': DATA')
+    opt.add_argument(dest='RESULTS', type=str, help=': RESULTS')
+    opt.add_argument(dest='SUP_MASK', type=str, help=': supression mask')
+    opt.add_argument(dest='ENH_MASK', type=str, help=': enhancement mask')
+    opt.add_argument(dest='SUBJ_LIST', nargs='*', help='preprocessing as <*>')
+    args = opt.parse_args()
+
+    return args
+
+
+def main():
+
+    args=parse_args()
+    for subj in args.SUBJ_LIST:
+        save_path = '%s/%s/regression/'%(args.RESULTS, subj)
+        if not os.path.exists(save_path): os.makedirs(save_path)
+
+        dg = DataGenerator(subj, args.RESULTS, args.DATA)
+        info_list = dg.get_info_list()
+        latent = dg.get_latent(info_list)
+        voxel = dg.get_voxel(info_list)
+    
+        voxel_masked = dg.get_masked_voxel(voxel)    
+        sup_mask, enh_mask = dg.get_sup_enh_mask( '%s/%s'%(dg.mask_dir,args.SUP_MASK)
+                                                , '%s/%s'%(dg.mask_dir,args.ENH_MASK))
+        
+        np.save('%s/voxel_masked'%save_path, voxel_masked)
+        np.save('%s/enh_mask'%save_path, enh_mask)
+        np.save('%s/sup_mask'%save_path, sup_mask)
+        np.save('%s/latent'%save_path, latent) 
+        print('* %s :'%subj, voxel_masked.shape, latent.shape, len(enh_mask[enh_mask==1]), len(sup_mask[sup_mask==1]))
+
+if __name__=='__main__':
+    main()
