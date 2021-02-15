@@ -7,6 +7,15 @@ source tool.sh
 TRIALWISE_DIR=${1}
 MASK_DIR=${2}
 
+
+if [ -d "$OUTPUT_DIR" ]; then
+  read -t 5 -p "data has already been converted. overwrite? (y/N) " overwrite || true
+  if [ "$overwrite" != "y" ]; then exit; fi
+  rm -rf $OUTPUT_DIR
+  else mkdir -p $OUTPUT_DIR
+fi
+
+
 #################################### aligning tstat to standard
 for run in {1..10}; do
 	#training + test set
