@@ -9,7 +9,7 @@ OUTPUT_DIR=$RESULTS/$SUBJ/mask
 bash scripts/gen_mask.sh $INPUT_DIR $OUTPUT_DIR
 
 # feat
-bash start-feat.sh $SUBJ trial_wise train
+bash scripts/feat.sh $SUBJ trial_wise train
 
 # aling trial_wise
 TRIALWISE_DIR=$RESULTS/$SUBJ/trial_wise

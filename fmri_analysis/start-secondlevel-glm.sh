@@ -10,3 +10,5 @@ input2=$INFIX
 output=$RESULTS/$SUBJ/secondlevel
 
 bash scripts/render-secondlevel-template.sh $input1 $input2 $output $TEMPLATE
+
+bash scripts/feat.sh $SUBJ secondlevel $INFIX
