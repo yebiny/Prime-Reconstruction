@@ -1,4 +1,5 @@
 #!/bin/bash
 
-RESULTS=/Volumes/BPlus/primeRec/results
-DATA=/Volumes/BPlus/primeRec/data
+
+DATA=/Volumes/BPlus/yb/primeRecon/data
+RESULTS=/Volumes/BPlus/yb/primeRecon/fmri_analysis/results

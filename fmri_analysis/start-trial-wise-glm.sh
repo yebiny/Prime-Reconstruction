@@ -15,8 +15,3 @@ bash scripts/feat.sh $SUBJ trial_wise train
 TRIALWISE_DIR=$RESULTS/$SUBJ/trial_wise
 MASK_DIR=$RESULTS/$SUBJ/mask
 bash scripts/aling_TrialWiseTstat2standard.sh $TRIALWISE_DIR $MASK_DIR
-
-# data generator
-SUP_MASK='sup_maskCut1_bin.nii.gz'
-ENH_MASK='enhance_maskCut1_bin.nii.gz'
-python scripts/data_generator.py $DATA $RESULTS $SUP_MASK $ENH_MASK $SUBJ

@@ -7,15 +7,7 @@ source tool.sh
 TRIALWISE_DIR=${1}
 MASK_DIR=${2}
 
-
-if [ -d "$OUTPUT_DIR" ]; then
-  read -t 5 -p "data has already been converted. overwrite? (y/N) " overwrite || true
-  if [ "$overwrite" != "y" ]; then exit; fi
-  rm -rf $OUTPUT_DIR
-  else mkdir -p $OUTPUT_DIR
-fi
-
-
+printf "== Start aling trial-wise : tstat to standard.. "
 #################################### aligning tstat to standard
 for run in {1..10}; do
 	#training + test set
@@ -26,11 +18,13 @@ for run in {1..10}; do
 
 	flirt -in $inputfile -ref $STANDARD_BRAIN -init $refmat -out $outputfile -applyxfm
 	done
+    printf $run
 done
 
+printf "\n== Start aling trial-wise : tstat map.. "
 #################################### masking aligned tstat map
 for run in {1..10}; do
-	#training + test set
+    #training + test set
 	for ii in {1..110}; do
 		inputfile=$TRIALWISE_DIR/phase1_trialWiseGLM_train_run$run.feat/stats/tstat${ii}_standard.nii.gz
 		for mm in 1 2; do
@@ -39,4 +33,5 @@ for run in {1..10}; do
 			fslmaths $inputfile -mas $mask $outputfile
 		done
 	done
+    printf $run
 done

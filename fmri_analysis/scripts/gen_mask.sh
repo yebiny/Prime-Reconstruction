@@ -4,11 +4,12 @@ INPUT_DIR=${1}
 OUTPUT_DIR=${2}
 
 if [ -d "$OUTPUT_DIR" ]; then
-  read -t 5 -p "data has already been converted. overwrite? (y/N) " overwrite || true
+ read -t 5 -p "data has already been converted. overwrite? (y/N) " overwrite || true
   if [ "$overwrite" != "y" ]; then exit; fi
   rm -rf $OUTPUT_DIR
   else mkdir -p $OUTPUT_DIR
 fi
+
 
 inputfile=$INPUT_DIR/phase1.gfeat/cope3.feat/stats/zstat1.nii.gz
 outputfile=$OUTPUT_DIR/stim_act_thr31.nii.gz
