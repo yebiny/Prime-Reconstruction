@@ -55,9 +55,9 @@ def make_phase2_onset_txt(onset_time, condition, output_dir, outfix='onset'):
     rep_f.close()
 
 SUBJ=sys.argv[1]
-excute_path='/Users/nibey/Desktop/WorkSpace/kBRI/faceRec/fmri'
-behavior_phase1_list=glob.glob('%s/data/%s/behavior/*phase1*mat'%(excute_path, SUBJ))
-behavior_phase2_list=glob.glob('%s/data/%s/behavior/*phase2*mat'%(excute_path, SUBJ))
+DATA_PATH=sys.argv[2]
+behavior_phase1_list=glob.glob('%s/%s/behavior/*phase1*mat'%(DATA_PATH, SUBJ))
+behavior_phase2_list=glob.glob('%s/%s/behavior/*phase2*mat'%(DATA_PATH, SUBJ))
 
 for behavior_phase1 in behavior_phase1_list:
     
