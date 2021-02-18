@@ -8,17 +8,23 @@
 > bash start-process.sh [subject] [ IMA directory path ]
 
 # Firstlevel-analysis
-## Rendering
-> bash start-rendering-firstlevel [ subject ] [ phase ] 
-## Feat
-> bash start-feat-firstl [ subject ] [ directory ] [ phase ]
+## 1. make design directory
+## 2. rendering
+## 3. feat
+> bash start-firstlevel-glm [ subject ] [ phase ] 
 
 # Secondlevel-analysis
-## Rendering
-> bash start-rendering-secondlevel [ subject ]  [ phase ]
-## Feat
-> bash start-feat [ subject  ] [directory ] [ phase ]
-
+## 1. rendering
+## 2. feat
+> bash start-secondlevel-glm [ subject  ] [ phase ]
 
 # Trial-wise analysis
-##
+## 0. ROI
+> bash gen_ROI.sh
+## 1. rendering
+> gen_trialWiseGLM_designFSF(RESULTS, DATA, SUBJ) -> matlab code
+## 2. generate mask
+## 3. feat
+## 4. aling trial_wise
+## 5. data generate
+> bash start-trial-wise-glm.sh [ subject ]
