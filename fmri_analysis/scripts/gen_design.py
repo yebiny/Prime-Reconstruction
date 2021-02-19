@@ -48,7 +48,8 @@ def make_phase2_onset_txt(onset_time, condition, output_dir, outfix='onset'):
             init_f.write(data)
             
         if c==2:
-            data = '%f    %i    %i'%(t-6, 1, 1)
+            print(t, t-6)
+            data = '%f    %i    %i\n'%(t-6, 1, 1)
             rep_f.write(data)
 
     init_f.close()
