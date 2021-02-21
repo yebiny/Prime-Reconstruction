@@ -10,12 +10,6 @@ input2=$RESULTS/$SUBJ/3-bet/t1_mprage_brain.nii.gz
 template=templates/firstlevel_$INFIX.fsf
 design=$DATA/$SUBJ/design
 
-# make design directory
-
-read -t 5 -p "Do you want make Design directory? (y/N) " overwrite || true
-if [ "$overwrite" == "y" ]; 
-then python scripts/gen_design.py $SUBJ $DATA;fi
-
 # rendering
 bash scripts/render-firstlevel-template.sh $input1 $input2 $output $template $design $INFIX
 

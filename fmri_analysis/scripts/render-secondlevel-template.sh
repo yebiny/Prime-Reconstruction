@@ -35,7 +35,7 @@ gfeat_out=$output_dir/$infix.gfeat
 
 if [ -d "$output_dir" ]; then
   read -t 5 -p "data has already been converted. overwrite? (y/N) " overwrite || true
-  if [ "$overwrite" != "y" ]; then exit; fi
+  if [ "$overwrite" == "n" ]; then exit; fi
 else mkdir $output_dir
 fi
 

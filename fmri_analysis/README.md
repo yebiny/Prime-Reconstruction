@@ -9,6 +9,7 @@
 
 # Firstlevel-analysis
 ## 1. make design directory
+> python gen_design [ subject ] [ DATA path ]
 ## 2. rendering
 ## 3. feat
 > bash start-firstlevel-glm [ subject ] [ phase ] 
