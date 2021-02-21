@@ -6,18 +6,16 @@ TARGET_DIR=${1}
 OUTPUT_DIR=${2}
 ORIENTATION=LAS
 
-
+# check output directory
 if [ -d "$OUTPUT_DIR" ]; then
-  read -t 5 -p "data has already been converted. overwrite? (y/N) " overwrite || true
-  if [ "$overwrite" != "y" ]; then exit; fi
-  rm -rf $OUTPUT_DIR
+  read -t 5 -p "data has already been converted. overwrite? (y/n) " overwrite || true
+  if [ "$overwrite" == "n" ]; then exit; fi
+else mkdir $OUTPUT_DIR
 fi
-
-printf "* output dir : %s"$OUTPUT_DIR"\n"
-mkdir -p $OUTPUT_DIR
 
 
 printf "=== Start reorient. ===\n"
+printf "* output dir : %s"$OUTPUT_DIR"\n"
 for target_file in `ls $TARGET_DIR/*.bxh`; do
   #file_name=$(echo ${target_file%%.*}| cut -d ' ' -f 3)
   file_name=$(echo ${target_file%%.*}| rev | cut -d '/' -f 1|rev)

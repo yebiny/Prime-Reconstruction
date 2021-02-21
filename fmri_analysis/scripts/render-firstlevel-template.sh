@@ -38,7 +38,7 @@ function render_firstlevel {
 
 
 if [ -d "$OUTPUT_DIR" ]; then
-  read -t 5 -p "data has already been converted. overwrite? (y/N) " overwrite || true
+  read -t 5 -p "data has already been converted. overwrite? (y/n) " overwrite || true
   if [ "$overwrite" == "n" ]; then exit; fi
 else mkdir $OUTPUT_DIR
 fi

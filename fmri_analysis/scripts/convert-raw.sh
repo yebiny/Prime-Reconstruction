@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e  # fail immediately on error
+source path.sh
 
 # variables
 SUBJ=${1}
@@ -8,8 +9,8 @@ OUTPUT_DIR=${3}
 
 # custom these lines
 export BXH_DIR=packages/bxh_xcede_tools-1.11.14-MacOSX.i686/bin/
-source data/$SUBJ/dicom_list.sh
-run_order_file=data/$SUBJ/run-order.txt
+source $DATA/$SUBJ/dicom_list.sh
+run_order_file=$DATA/$SUBJ/run-order.txt
 
 # fix lines 
 ORIENTATION=LAS
@@ -20,12 +21,13 @@ UNEXPECTED_NUMBER_OF_TRS=2
 
 # check output directory
 if [ -d "$OUTPUT_DIR" ]; then
-  read -t 5 -p "data has already been converted. overwrite? (y/N) " overwrite || true
-  if [ "$overwrite" != "y" ]; then exit; fi
-  rm -rf $OUTPUT_DIR
+  read -t 5 -p "data has already been converted. overwrite? (y/n) " overwrite || true
+  if [ "$overwrite" == "n" ]; then exit; fi
+else mkdir $OUTPUT_DIR
 fi
+
+
 printf "* output dir : %s"$OUTPUT_DIR"\n"
-mkdir -p $OUTPUT_DIR
 temp_output_dir=$(mktemp -d -t tmp.XXXXXX)
 
 
