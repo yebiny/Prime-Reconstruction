@@ -1,0 +1,10 @@
+.ipynb_checkpoints
+.DS_Store
+__*__
+packages/
+data/
+results/
+path.sh
+*npy
+auto-glm.sh
+auto-process.sh
