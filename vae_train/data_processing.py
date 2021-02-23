@@ -30,7 +30,7 @@ for i in range(split_num):
     
     x_data = np.array(images)
     x_data.shape
-    save_dir = './data/celeba_split/'
+    save_dir = 'data'
     save_name='celeba_%i'%(end)
     np.save('%s/%s'%(save_dir, save_name), x_data)
     print('* Save  images as ',save_name) 
