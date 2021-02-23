@@ -22,15 +22,14 @@ def plot_multiple_images(images, n_cols=None, save=None):
     else:
         plt.show()
 
-def plot_generated_images(generator, seed, save=None):
-    generated_images = generator.predict(seed)
-    generated_images = (generated_images+1)/2
-    plot_multiple_images(generated_images, 8, save) 
+def plot_gen_imgs(generator, seed, save=None):
+    gen_imgs = generator.predict(seed)
+    gen_imgs = np.clip(gen_imgs, 0, 1)
+    plot_multiple_images(gen_imgs, 8, save) 
 
 def plot_rec_images(reconstructor, data, save=None):
-    reconstructed_images = reconstructor.predict(data)
-    reconstructed_images = (reconstructed_images+1)/2
-    plot_multiple_images(reconstructed_images, 8, save)
+    rec_imgs = reconstructor.predict(data)
+    plot_multiple_images(rec_imgs, 8, save)
 
 def plot_loss(history, save=None):
     figure=plt.figure()

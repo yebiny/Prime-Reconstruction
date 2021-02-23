@@ -6,19 +6,6 @@ from sklearn.model_selection import train_test_split
 from models import *
 from draw import *
 
-def reduce_lr(pre_v_loss, v_loss, count, lr, patience, factor, min_lr):
-    if v_loss < pre_v_loss:
-        count = 0
-    else:
-        count += 1
-        if count >= patience:
-            lr = lr*factor
-            if lr < min_lr:
-                lr = min_lr
-            count = 0
-            print('reduce learning rate..', lr)
-    return count, lr
-
 
 class TrainVAE():
 
@@ -96,6 +83,19 @@ class TrainVAE():
 
 
     def train(self, epochs, batch_size=32, init_lr=0.001):
+        
+        def _reduce_lr(pre_v_loss, v_loss, count, lr, patience, factor, min_lr):
+            if v_loss < pre_v_loss:
+                count = 0
+            else:
+                count += 1
+                if count >= patience:
+                    lr = lr*factor
+                    if lr < min_lr:
+                        lr = min_lr
+                    count = 0
+                    print('reduce learning rate..', lr)
+            return count, lr
      
         train_ds, valid_ds = self.make_dataset(batch_size) 
 
@@ -122,7 +122,7 @@ class TrainVAE():
             l_rate = optimizer.learning_rate.numpy()
         
             # Control learning rate
-            count, lr  = reduce_lr(best_loss, v_loss, count, l_rate, 5, 0.2, 0.00001)
+            count, lr  = _reduce_lr(best_loss, v_loss, count, l_rate, 5, 0.2, 0.00001)
             optimizer.learning_rate = lr
             
             # Plot reconstruct image per 10 epochs

@@ -25,7 +25,7 @@ for i in range(split_num):
     crop = (30, 55, 150, 175) #croping size for the image so that only the face at centre is obtained
     images = [np.array((Image.open(path).crop(crop)).resize((64,64))) for path in split_dataset]
     print('* Crop images') 
-    images = np.array(images)/255
+    images = (np.array(images)/127.5)-1
     print('* Norm images') 
     
     x_data = np.array(images)
