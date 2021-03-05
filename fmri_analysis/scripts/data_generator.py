@@ -14,8 +14,8 @@ class DataGenerator():
         path_tstat = 'stats/tstat00_mask1.nii.gz'
         path_behavior = '%s/%s/behavior/data_phase1_run00.mat'%(DATA_PATH, SUBJ)
         path_mask = '%s/%s/mask/mask1.nii'%(RESULTS_PATH, SUBJ)
-        path_flat='scripts/f_latent.npy'
-        path_mlat='scripts/m_latent.npy'
+        path_flat='scripts/f_latent_z1000.npy'
+        path_mlat='scripts/m_latent_z1000.npy'
        
         
         # Get data from paths
@@ -48,18 +48,25 @@ class DataGenerator():
     def get_latent(self, info_list):
     
         lat_list=[]
+        gender_list=[]
+
         for info in info_list:
             gender = info[2][0]
             idx = info[2][1]
 
-            if gender==1: lat_map=self.f_lat 
-            else: lat_map=self.m_lat
+            if gender==1: 
+                lat_map=self.f_lat
+                gender_list.append(1)
+            else: 
+                lat_map=self.m_lat
+                gender_list.append(0)
 
             lat = lat_map[:,1][idx-1][0]
             lat_list.append(lat)
 
         lat_arr = np.array(lat_list)
-        return lat_arr
+        gender_arr = np.array(gender_list)
+        return lat_arr, gender_arr
     
     def get_voxel(self, info_list):
         voxel_list = []
@@ -113,12 +120,12 @@ def main():
 
     args=parse_args()
     for subj in args.SUBJ_LIST:
-        save_path = '%s/%s/regression/'%(args.RESULTS, subj)
+        save_path = '%s/%s/regression_z1000_mask1/'%(args.RESULTS, subj)
         if not os.path.exists(save_path): os.makedirs(save_path)
 
         dg = DataGenerator(subj, args.RESULTS, args.DATA)
         info_list = dg.get_info_list()
-        latent = dg.get_latent(info_list)
+        latent, gender = dg.get_latent(info_list)
         voxel = dg.get_voxel(info_list)
     
         voxel_masked = dg.get_masked_voxel(voxel)    
@@ -129,6 +136,7 @@ def main():
         np.save('%s/enh_mask'%save_path, enh_mask)
         np.save('%s/sup_mask'%save_path, sup_mask)
         np.save('%s/latent'%save_path, latent) 
+        np.save('%s/gender'%save_path, gender) 
         print('* %s :'%subj, voxel_masked.shape, latent.shape, len(enh_mask[enh_mask==1]), len(sup_mask[sup_mask==1]))
 
 if __name__=='__main__':

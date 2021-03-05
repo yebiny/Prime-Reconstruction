@@ -14,7 +14,6 @@ def load_dict(load_path):
         dic = pickle.load(fr)
     return dic
 
-
 def split_data(x, y, n_regression):
     mask_train = []
     mask_test = []
@@ -62,8 +61,6 @@ def get_corr(y_test, y_pred):
     
     return corr, self_corr, other_corr
 
-
-
 def start_analsysis_diffR(sub_list, load_path, corr_dict):
 
     for SUBJ in sub_list:
@@ -101,7 +98,6 @@ def start_analsysis_diffR(sub_list, load_path, corr_dict):
             model = make_model(x_train, y_train)
             y_pred = model.predict(x_test)
             corr, self_enh, other_enh = get_corr(y_test, y_pred)
-
 
             print('* %i :     %.3f    %.3f     %.3f    %.3f     %.3f    %.3f'
                   %(n_iter, self_all, other_all, self_sup, other_sup, self_enh, other_enh))
