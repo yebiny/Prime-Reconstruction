@@ -81,7 +81,7 @@ class VAE():
     def _save_best_model(self, mn_loss, history, valid_split, save_path):
         if valid_split: base_loss=history['v_loss'][-1]
         else: base_loss = history['loss'][-1]
-        
+
         if mn_loss >= base_loss: 
             self.save_model(save_path)
             mn_loss = base_loss
@@ -89,7 +89,7 @@ class VAE():
         
         return mn_loss
 
-    def train(self, x_data, epochs=1, batch_size=16, img_iter=1, valid_split=None, save_path=None):
+    def fit(self, x_data, epochs=1, batch_size=16, img_iter=1, valid_split=None, save_path=None):
         
         ## Set train/valid dataset ##
         train_ds, valid_ds = self._make_dataset(x_data, batch_size, valid_split)
@@ -106,33 +106,30 @@ class VAE():
             ## batch-trainset ##
             for batch_imgs in train_ds:
                 losses = self._train_step(batch_imgs)
-                 
                 for name, loss in zip(loss_name, losses): history[name][-1]+=loss
             
             ## batch-validset ##
             if valid_split:
                 for batch_imgs in valid_ds:
                     v_losses = self._valid_step(batch_imgs)
-                    
                     for name, loss in zip(v_loss_name, v_losses): history[name][-1]+=loss
-            
+                
             ## print losses ##
             print('* %i / %i : loss: %f, v_loss: %f'%(epoch, epochs, history['loss'][-1], history['v_loss'][-1]))
             
-            ## save sample image ##
-            if epoch%img_iter==0:
-                self.plot_sample_imgs(batch_imgs, save_path=save_path)
-
-            ## save best model ##
+            ## save model ##
             if save_path:
-                if epoch==1: mn_loss=base_loss
-                mn_loss = self._save_best_model(mn_loss, history, valid_split, save_path)
+                if epoch%img_iter==0:
+                    self.plot_sample_imgs(batch_imgs, save_path=save_path)
+                if epoch==1: mn_loss = history['v_loss'][0]
+                else: mn_loss = self._save_best_model(mn_loss, history, valid_split, save_path)
         
         return history 
 
     def plot_sample_imgs(self, imgs, n=10, save_path=None):
         plt.figure(figsize=(n,2))
         rec_imgs = self.vae.predict(imgs[:n])
+        rec_imgs = np.clip(rec_imgs, 0, 1)
         for i, (img, rec_img) in enumerate(zip(imgs, rec_imgs)):
             plt.subplot(2,n,i+1)
             plt.imshow(np.squeeze(img), cmap='gray_r')

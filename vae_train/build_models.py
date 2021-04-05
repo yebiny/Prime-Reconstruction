@@ -4,10 +4,11 @@ from tensorflow.keras import layers, models
 from tensorflow.keras import backend as K
 
 class BuildModel():
-    def __init__(self, img_shape, z_dim, dense_dim=512):
+    def __init__(self, img_shape, z_dim, dense_dim=512, n_layers=4):
         self.img_shape = img_shape
         self.z_dim = z_dim
         self.dense_dim = dense_dim
+        self.n_layers = n_layers
 
     def _sampling(self, args):
         """Reparameterization function by sampling from an isotropic unit Gaussian.
@@ -29,14 +30,9 @@ class BuildModel():
         
         y = layers.Conv2D(32, 3, strides=2, padding="same")(inputs)
         y = layers.LeakyReLU()(y)
-        y = layers.Conv2D(32, 3, strides=2, padding="same")(y)
-        y = layers.LeakyReLU()(y)
-        y = layers.Conv2D(32, 3, strides=2, padding="same")(y)
-        y = layers.LeakyReLU()(y)
-        #y = layers.Conv2D(32, 3, strides=2, padding="same")(y)
-        #y = layers.LeakyReLU()(y)
-        #y = layers.Conv2D(32, 3, strides=2, padding="same")(y)
-        #y = layers.LeakyReLU()(y)
+        for n in range(self.n_layers-1):
+            y = layers.Conv2D(32, 3, strides=2, padding="same")(y)
+            y = layers.LeakyReLU()(y)
         self.y_shape = y.shape
         
         y = layers.Flatten()(y)
@@ -60,14 +56,9 @@ class BuildModel():
                         , activation="relu")(y)
         y = layers.Reshape(self.y_shape[1:])(y)
         
-        y = layers.Conv2DTranspose(32, 3, strides=2, padding="same")(y)
-        y = layers.LeakyReLU()(y)
-        y = layers.Conv2DTranspose(32, 3, strides=2, padding="same")(y)
-        y = layers.LeakyReLU()(y)
-        #y = layers.Conv2DTranspose(32, 3, strides=2, padding="same")(y)
-        #y = layers.LeakyReLU()(y)
-        #y = layers.Conv2DTranspose(32, 3, strides=2, padding="same")(y)
-        #y = layers.LeakyReLU()(y)
+        for n in range(self.n_layers-1):
+            y = layers.Conv2DTranspose(32, 3, strides=2, padding="same")(y)
+            y = layers.LeakyReLU()(y)
         y = layers.Conv2DTranspose(self.img_shape[-1], 3, strides=2, padding="same")(y)
         y = layers.Activation('sigmoid')(y)
     
