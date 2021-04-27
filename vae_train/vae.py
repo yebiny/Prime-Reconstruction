@@ -145,8 +145,6 @@ class VAE():
         else: plt.show()
 
     def save_model(self, save_path):
-        self.encoder.save('%s/encoder.h5'%save_path)
-        self.decoder.save('%s/decoder.h5'%save_path)
         self.vae.save('%s/vae.h5'%save_path)
 
     def plot_model(self, save_path):
